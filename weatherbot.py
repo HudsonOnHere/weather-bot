@@ -8,6 +8,7 @@ from telebot import TeleBot
 
 load_dotenv()
 
+# YOU WILL NEED YOUR OWN API KEYS TO GET THIS WORKING
 API_KEY = os.getenv('API_KEY')
 BOT_KEY = os.getenv('BOT_KEY')
 
@@ -38,13 +39,6 @@ def parseData():
 
 
 app = TeleBot(__name__)
-
-# example /command functionality
-# @app.route('/command ?(.*)')
-# def core_function(message, cmd):
-#     chat_dest = message['chat']['id']
-#     msg = "Command Recieved: {}".format(cmd)
-#     app.send_message(chat_dest, msg)
 
 # /start function
 @app.route('/start ?(.*)')
