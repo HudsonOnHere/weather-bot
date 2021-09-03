@@ -19,13 +19,15 @@ url = f"http://api.openweathermap.org/data/2.5/forecast?"\
 # make a request to get data
 data = r.get(url).json()
 
-# gets us the date (&time if we want it, not neccessary here)
-now = datetime.datetime.now().strftime('%A, %B %dth, %Y')
+# gets us the date & time
+today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
+time = datetime.datetime.now().strftime('%H:%M') # will be utilized in next version
+
 
 
 # gets the specific data the bot will send as a string
 def parseData():
-    header = f"Good morning New York City,\n\nToday is {now}\n\nHere is the forecast for today:\n\n"
+    header = f"Good morning New York City,\n\nToday is {today}\n\nHere is the forecast for today:\n\n"
     for forecast in data['list'][0:5]:
         output = f"""{header}Weather Conditions: {forecast['weather'][0]['main'].title()}
         Description: {forecast['weather'][0]['description'].title()}
@@ -34,33 +36,36 @@ def parseData():
         Feels like: {int(forecast['main']['feels_like'])}˚ F
         High: {int(forecast['main']['temp_max'])}˚ F
         Low: {int(forecast['main']['temp_min'])}˚ F
-        Wind speed: {int(forecast['wind']['speed'])} mph"""
+        Wind Speed: {int(forecast['wind']['speed'])} mph
+        Wind Gusts up to {int(forecast['wind']['gust'])} mph"""
         return output
 
 
-app = TeleBot(__name__)
 
-# /start function
-@app.route('/start ?(.*)')
+bot = TeleBot(__name__)
+
+# /weather function
+@bot.route('/weather ?(.*)')
 def start(message, cmd):
     chat_dest = message['chat']['id']
-    app.send_message(chat_dest, parseData())
+    bot.send_message(chat_dest, parseData())
 
 # /help message
-@app.route('/help ?(.*)')
+@bot.route('/help ?(.*)')
 def start(message, cmd):
     chat_dest = message['chat']['id']
-    msg = "Run /start to get the weather report, or run /help to see this message again."
-    app.send_message(chat_dest, msg)
+    msg = "Run /weather to get the weather report, or run /help to see this message again."
+    bot.send_message(chat_dest, msg)
 
 # misc reply for any message received
-@app.route('(?!/).+')
+@bot.route('(?!/).+')
 def parrot(message):
    chat_dest = message['chat']['id']
-   msg = "I only know /start and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
-   app.send_message(chat_dest, msg)
+   msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
+   bot.send_message(chat_dest, msg)
 
 
 if __name__ == '__main__':
-    app.config['api_key'] = BOT_KEY
-    app.poll(debug=True)
+    bot.config['api_key'] = BOT_KEY
+    bot.poll(debug=True)
+    bot.poll(none_stop=True)
