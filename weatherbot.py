@@ -8,11 +8,19 @@ from telebot import TeleBot
 
 load_dotenv()
 
+class ConnectionError(Exception):
+    def __init__(self, error, message="Connection interrupted, reconnecting..."):
+        self.error = error
+        self.message = message
+        super().__init__(self.message)
+        
+
+
 # YOU WILL NEED YOUR OWN API KEYS TO GET THIS WORKING
 API_KEY = os.getenv('API_KEY')
 BOT_KEY = os.getenv('BOT_KEY')
 
-# API url
+# weather API url
 url = f"http://api.openweathermap.org/data/2.5/forecast?"\
         f"id=5128581&units=imperial&cnt=1&appid={API_KEY}"
 
@@ -40,32 +48,42 @@ def parseData():
         Wind Gusts up to {int(forecast['wind']['gust'])} mph"""
         return output
 
+def weatherBot():
+    
+    bot = TeleBot(__name__)
+
+    # /weather function
+    @bot.route('/weather ?(.*)')
+    def weather(message, cmd):
+        chat_dest = message['chat']['id']
+        bot.send_message(chat_dest, parseData())
+
+    # /help message
+    @bot.route('/help ?(.*)')
+    def help(message, cmd):
+        chat_dest = message['chat']['id']
+        msg = "Run /weather to get the weather report, or run /help to see this message again."
+        bot.send_message(chat_dest, msg)
+
+    # misc reply for any message received
+    @bot.route('(?!/).+')
+    def repeat(message):
+        chat_dest = message['chat']['id']
+        msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
+        bot.send_message(chat_dest, msg)
+
+    if __name__ == '__main__':
+        bot.config['api_key'] = BOT_KEY
+        bot.poll(debug=True)
+        bot.poll(none_stop=True)
 
 
-bot = TeleBot(__name__)
+while True:
+    try:
+        weatherBot()
+    except:
+        raise ConnectionError(weatherBot())
+    finally:
+        weatherBot()
 
-# /weather function
-@bot.route('/weather ?(.*)')
-def start(message, cmd):
-    chat_dest = message['chat']['id']
-    bot.send_message(chat_dest, parseData())
-
-# /help message
-@bot.route('/help ?(.*)')
-def start(message, cmd):
-    chat_dest = message['chat']['id']
-    msg = "Run /weather to get the weather report, or run /help to see this message again."
-    bot.send_message(chat_dest, msg)
-
-# misc reply for any message received
-@bot.route('(?!/).+')
-def parrot(message):
-   chat_dest = message['chat']['id']
-   msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
-   bot.send_message(chat_dest, msg)
-
-
-if __name__ == '__main__':
-    bot.config['api_key'] = BOT_KEY
-    bot.poll(debug=True)
-    bot.poll(none_stop=True)
+    
