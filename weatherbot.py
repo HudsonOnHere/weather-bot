@@ -1,6 +1,8 @@
 #! /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 
+from email import message
 import os
+from unicodedata import name
 from dotenv import load_dotenv
 import requests as r
 import datetime
@@ -48,42 +50,35 @@ def parseData():
         Wind Gusts up to {int(forecast['wind']['gust'])} mph"""
         return output
 
-def weatherBot():
-    
-    bot = TeleBot(__name__)
 
-    # /weather function
-    @bot.route('/weather ?(.*)')
-    def weather(message, cmd):
-        chat_dest = message['chat']['id']
-        bot.send_message(chat_dest, parseData())
+bot = TeleBot(__name__)
 
-    # /help message
-    @bot.route('/help ?(.*)')
-    def help(message, cmd):
-        chat_dest = message['chat']['id']
-        msg = "Run /weather to get the weather report, or run /help to see this message again."
-        bot.send_message(chat_dest, msg)
+# /weather function
+@bot.route('/weather ?(.*)')
+def weather(message, cmd):
+    chat_dest = message['chat']['id']
+    bot.send_message(chat_dest, parseData())
 
-    # misc reply for any message received
-    @bot.route('(?!/).+')
-    def repeat(message):
-        chat_dest = message['chat']['id']
-        msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
-        bot.send_message(chat_dest, msg)
+# /help message
+@bot.route('/help ?(.*)')
+def help(message, cmd):
+    chat_dest = message['chat']['id']
+    msg = "Run /weather to get the weather report, or run /help to see this message again."
+    bot.send_message(chat_dest, msg)
 
-    if __name__ == '__main__':
-        bot.config['api_key'] = BOT_KEY
-        bot.poll(debug=True)
-        bot.poll(none_stop=True)
+# misc reply for any message received
+@bot.route('(?!/).+')
+def repeat(message):
+    chat_dest = message['chat']['id']
+    msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
+    bot.send_message(chat_dest, msg)
 
-
-while True:
+if __name__ == '__main__':
+    bot.config['api_key'] = BOT_KEY
     try:
-        weatherBot()
-    except:
-        raise ConnectionError(weatherBot())
+        bot.poll(debug=True)
+    except ValueError as e:
+        raise ConnectionError(message)
     finally:
-        weatherBot()
+        bot.poll(debug=True)
 
-    
