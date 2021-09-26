@@ -4,7 +4,7 @@ A bot, written for NYC Esk8 on Telegram, designed to report on the weather condi
 
 # Scope
 
-In it's current form, this program understands only two(2) commands, "/start", and "/help", respectively. Future versions will encapsulate additional functionality, automatic triggering, etc.
+In it's current form, this program understands only two(2) commands, "/weather", and "/help", respectively. Future versions will encapsulate additional functionality, automatic triggering, etc.
 
 # How to make this your own
 
