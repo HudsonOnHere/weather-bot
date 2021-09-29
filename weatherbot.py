@@ -1,6 +1,3 @@
-#! /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
-
-from email import message
 import os
 from dotenv import load_dotenv
 import requests as r
