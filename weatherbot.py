@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> e05b6ec0a3e7e61e43186289fee5377176c58691
 import os
 from dotenv import load_dotenv
 import requests as r
@@ -19,6 +23,7 @@ data = r.get(url).json()
 
 # gets us the date & time
 today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
+<<<<<<< HEAD
 now = datetime.datetime.now()
 cutoffMorning = datetime.datetime(now.year, now.month, now.day, 12)
 cutoffAfternoon = datetime.datetime(now.year, now.month, now.day, 17)
@@ -32,6 +37,8 @@ def timeCheck():
             return "afternoon"
         return "morning"
     return "evening"
+=======
+>>>>>>> e05b6ec0a3e7e61e43186289fee5377176c58691
 
 
 # gets the specific data the bot will send as a string
