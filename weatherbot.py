@@ -19,12 +19,24 @@ data = r.get(url).json()
 
 # gets us the date & time
 today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
-time = datetime.datetime.now().strftime('%H:%M') # will be utilized in next version
+now = datetime.datetime.now()
+cutoffMorning = datetime.datetime(now.year, now.month, now.day, 12)
+cutoffAfternoon = datetime.datetime(now.year, now.month, now.day, 17)
+cutoffEvening = datetime.datetime(now.year, now.month, now.day, 5)
+
+def timeCheck():
+    if now >= cutoffMorning:
+        if now >= cutoffAfternoon:
+            if now >= cutoffEvening:
+                return "evening"
+            return "afternoon"
+        return "morning"
+    return "evening"
 
 
 # gets the specific data the bot will send as a string
 def parseData():
-    header = f"Good morning New York City,\n\nToday is {today}\n\nHere is the forecast for today:\n\n"
+    header = f"Good {timeCheck()} New York City,\n\nToday is {today}\n\nHere is the current forecast:\n\n"
     for forecast in data['list'][0:5]:
         output = f"""{header}Weather Conditions: {forecast['weather'][0]['main'].title()}
         Description: {forecast['weather'][0]['description'].title()}
