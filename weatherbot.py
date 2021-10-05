@@ -1,6 +1,4 @@
-#! /Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 
-from email import message
 import os
 from dotenv import load_dotenv
 import requests as r
@@ -22,7 +20,6 @@ data = r.get(url).json()
 
 # gets us the date & time
 today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
-time = datetime.datetime.now().strftime('%H:%M') # will be utilized in next version
 
 
 # gets the specific data the bot will send as a string
