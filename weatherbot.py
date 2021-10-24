@@ -21,15 +21,12 @@ data = r.get(url).json()
 # gets us the date & time
 today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
 
-now = datetime.datetime.now()
-
-cutoffMorning = datetime.datetime(now.year, now.month, now.day, 12)
-
-cutoffAfternoon = datetime.datetime(now.year, now.month, now.day, 17)
-
-cutoffEvening = datetime.datetime(now.year, now.month, now.day, 5)
-
 def timeCheck():
+    now = datetime.datetime.now()
+    cutoffMorning = datetime.datetime(now.year, now.month, now.day, 12)
+    cutoffAfternoon = datetime.datetime(now.year, now.month, now.day, 17)
+    cutoffEvening = datetime.datetime(now.year, now.month, now.day, 5)
+
     if now >= cutoffMorning:
         if now >= cutoffAfternoon:
             if now >= cutoffEvening:
@@ -37,7 +34,6 @@ def timeCheck():
             return "afternoon"
         return "morning"
     return "evening"
-
 
 
 # gets the specific data the bot will send as a string
@@ -82,8 +78,8 @@ def repeat(message):
 if __name__ == '__main__':
     bot.config['api_key'] = BOT_KEY
     try:
-        bot.poll(debug=True)
+        bot.poll()
     except Exception as e:
         pass
     finally:
-        bot.poll(debug=True)
+        bot.poll()
