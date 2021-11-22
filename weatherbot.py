@@ -33,13 +33,13 @@ def timeCheck():
     if now <= beginMorning:
         return "evening"
 
-    if now > beginMorning and now <= beginAfternoon:
+    elif now > beginMorning and now <= beginAfternoon:
         return "morning"
 
-    if now > beginAfternoon and now <= beginEvening:
+    elif now > beginAfternoon and now <= beginEvening:
         return "afternoon"
 
-    if now > beginEvening:
+    elif now > beginEvening:
         return "evening"
 
 
