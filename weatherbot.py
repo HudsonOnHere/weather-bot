@@ -23,17 +23,24 @@ today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
 
 def timeCheck():
     now = datetime.datetime.now()
-    cutoffMorning = datetime.datetime(now.year, now.month, now.day, 12)
-    cutoffAfternoon = datetime.datetime(now.year, now.month, now.day, 17)
-    cutoffEvening = datetime.datetime(now.year, now.month, now.day, 5)
+    beginAfternoon = datetime.datetime(now.year, now.month, now.day, 12)
+    beginEvening = datetime.datetime(now.year, now.month, now.day, 17)
+    beginMorning = datetime.datetime(now.year, now.month, now.day, 5)
 
-    if now >= cutoffMorning:
-        if now >= cutoffAfternoon:
-            if now >= cutoffEvening:
-                return "morning"
-            return "evening"
+# this needs to be rewritten entirely.
+# drop an F in the chat
+
+    if now <= beginMorning:
+        return "evening"
+
+    if now > beginMorning and now <= beginAfternoon:
+        return "morning"
+
+    if now > beginAfternoon and now <= beginEvening:
         return "afternoon"
-    return "evening"
+
+    if now > beginEvening:
+        return "evening"
 
 
 # gets the specific data the bot will send as a string
