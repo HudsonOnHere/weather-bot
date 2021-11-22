@@ -30,9 +30,9 @@ def timeCheck():
     if now >= cutoffMorning:
         if now >= cutoffAfternoon:
             if now >= cutoffEvening:
-                return "evening"
-            return "afternoon"
-        return "morning"
+                return "morning"
+            return "evening"
+        return "afternoon"
     return "evening"
 
 
