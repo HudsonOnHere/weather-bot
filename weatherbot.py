@@ -27,9 +27,6 @@ def timeCheck():
     beginEvening = datetime.datetime(now.year, now.month, now.day, 17)
     beginMorning = datetime.datetime(now.year, now.month, now.day, 5)
 
-# this needs to be rewritten entirely.
-# drop an F in the chat
-
     if now <= beginMorning:
         return "evening"
 
