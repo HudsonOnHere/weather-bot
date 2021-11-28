@@ -5,6 +5,7 @@ import requests as r
 import datetime
 from telebot import TeleBot
 
+# load our environmental variables (api keys)
 load_dotenv()
 
 # YOU WILL NEED YOUR OWN API KEYS TO GET THIS WORKING
@@ -18,9 +19,8 @@ url = f"http://api.openweathermap.org/data/2.5/forecast?"\
 # make a request to get data
 data = r.get(url).json()
 
-# gets us the date & time
-today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
-
+# this function is used to get us the time of day (morning, afternoon, or evening)
+# this is utilized below in parseData() to add the proper header to the message
 def timeCheck():
     now = datetime.datetime.now()
     beginAfternoon = datetime.datetime(now.year, now.month, now.day, 12)
@@ -40,8 +40,11 @@ def timeCheck():
         return "evening"
 
 
-# gets the specific data the bot will send as a string
+# queries api for specific strings
+# calls timeCheck() to get the proper time of day
+# returns as a string send in a message by the bot when /weather is called
 def parseData():
+    today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
     header = f"Good {timeCheck()} New York City,\n\nToday is {today}\n\nHere is the current forecast:\n\n"
     for forecast in data['list'][0:5]:
         output = f"""{header}Weather Conditions: {forecast['weather'][0]['main'].title()}
@@ -56,15 +59,16 @@ def parseData():
         return output
 
 
+# init the bot
 bot = TeleBot(__name__)
 
-# /weather function
+# /weather command
 @bot.route('/weather ?(.*)')
 def weather(message, cmd):
     chat_dest = message['chat']['id']
     bot.send_message(chat_dest, parseData())
 
-# /help message
+# /help command
 @bot.route('/help ?(.*)')
 def help(message, cmd):
     chat_dest = message['chat']['id']
@@ -78,7 +82,9 @@ def repeat(message):
     msg = "I only know /weather and /help. And yes, those commands are case-sensitive." #.format(user_msg) # this will include their message in the bot's reply
     bot.send_message(chat_dest, msg)
 
-# keeps bot running even if connection is interrupted
+
+# keeps bot alive even if connection is interrupted
+# polls for new messahes continually
 if __name__ == '__main__':
     bot.config['api_key'] = BOT_KEY
     try:
