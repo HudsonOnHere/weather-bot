@@ -12,12 +12,6 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY')
 BOT_KEY = os.getenv('BOT_KEY')
 
-# weather API url
-url = f"http://api.openweathermap.org/data/2.5/forecast?"\
-        f"id=5128581&units=imperial&cnt=1&appid={API_KEY}"
-
-# make a request to get data
-data = r.get(url).json()
 
 # this function is used to get us the time of day (morning, afternoon, or evening)
 # this is utilized below in parseData() to add the proper header to the message
@@ -44,6 +38,14 @@ def timeCheck():
 # calls timeCheck() to get the proper time of day
 # returns as a string send in a message by the bot when /weather is called
 def parseData():
+
+    # weather API url
+    url = f"http://api.openweathermap.org/data/2.5/forecast?"\
+        f"id=5128581&units=imperial&cnt=1&appid={API_KEY}"
+    # make a request to get data
+    data = r.get(url).json()
+
+
     today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
     header = f"Good {timeCheck()} New York City,\n\nToday is {today}\n\nHere is the current forecast:\n\n"
     for forecast in data['list'][0:5]:
