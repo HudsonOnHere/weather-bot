@@ -46,18 +46,18 @@ def parseData():
     data = r.get(url).json()
 
 
-    today = datetime.datetime.now().strftime('%A, %B %dth, %Y')
+    today = datetime.datetime.now().strftime('%A, %B %d, %Y')
     header = f"Good {timeCheck()} New York City,\n\nToday is {today}\n\nHere is the current forecast:\n\n"
     for forecast in data['list'][0:5]:
         output = f"""{header}Weather Conditions: {forecast['weather'][0]['main'].title()}
-    Description: {forecast['weather'][0]['description'].title()}
-    Temperature: {int(forecast['main']['temp'])}˚ F
-    Humidity: {int(forecast['main']['humidity'])}%
-    Feels like: {int(forecast['main']['feels_like'])}˚ F
-    High: {int(forecast['main']['temp_max'])}˚ F
-    Low: {int(forecast['main']['temp_min'])}˚ F
-    Wind Speed: {int(forecast['wind']['speed'])} mph
-    Wind Gusts up to {int(forecast['wind']['gust'])} mph"""
+Description: {forecast['weather'][0]['description'].title()}
+Temperature: {int(forecast['main']['temp'])}˚ F
+Humidity: {int(forecast['main']['humidity'])}%
+Feels like: {int(forecast['main']['feels_like'])}˚ F
+High: {int(forecast['main']['temp_max'])}˚ F
+Low: {int(forecast['main']['temp_min'])}˚ F
+Wind Speed: {int(forecast['wind']['speed'])} mph
+Wind Gusts up to {int(forecast['wind']['gust'])} mph"""
         return output
 
 
