@@ -70,6 +70,12 @@ def weather(message, cmd):
     chat_dest = message['chat']['id']
     bot.send_message(chat_dest, parseData())
 
+@bot.route('/bye ?(.*)')
+def bye(message, cmd):
+    chat_dest = message['chat']['id']
+    msg = "Goodbye friends! \n\nI am now deprecated, and will cease to function as you currently know me. It is my hope that my next iteration will serve you better. \n\nI will be back soon!"
+    bot.send_message(chat_dest, msg)
+
 # /help command
 @bot.route('/help ?(.*)')
 def help(message, cmd):
