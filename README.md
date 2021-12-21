@@ -19,4 +19,4 @@ Alternatively, you can run this locally, just keep in mind that you must be conn
 
 Pronounced "E-Skate," we are an collection of electric skateboarding-focused enthusiasts from New York City and the Greater Metropolitan Area. Stemming from NYC Eboarding, we are advocates for Personal Electric Vehicles (PEVs) and micromobility as a whole. It's a great community, very grassroots. 
 
-If you are interested in learning more check out our group on Telegram messenger: t.me/nycesk8
+If you are interested in learning more check out our group on Telegram messenger: ![Markdown](t.me/nycesk8)
