@@ -3,7 +3,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
 # in future versions, we will be able to handle geolocation data from telegram
-# 45 e 1st street approx lat/long
+# for now we will use these coordinates
 latitude = '40.7239'
 longitude = '-73.9899'
 
@@ -32,7 +32,7 @@ def get_alerts():
         alerts_data_list += f"""{alert['properties']['headline']}:\n{alert['properties']['severity']}\n{alert['properties']['description']}\n\n"""
 
     if alerts_data_list == "":
-        alerts_data_list = "Ain't no alerts, check Citizen if you want action.\n\n"
+        alerts_data_list += f"""Ain't no alerts, check Citizen if you want action.\n\n"""
 
     else:
         alerts_data_list += f"""Idk here's some alerts or w/e:\n\n"""

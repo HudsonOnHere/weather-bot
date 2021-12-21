@@ -1,4 +1,3 @@
-# import argparse
 import telebot
 from dotenv import load_dotenv
 import os
@@ -15,9 +14,9 @@ bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
 def send_welcome(message):
     bot.reply_to(message, "I'm WeatherBot, I can tell you the weather.\n\nInteract with me by sending one of these commands:\n\n/alerts - gives you the current alerts.\n\n/forecast - gives you the daily forecast.\n\n/hourly - gives you the hourly forecast.\n\n/help - gives you this message.")
 
-@bot.message_handler(commands=['info'])
-def send_info(message):
-    bot.reply_to(message, get_info())
+# @bot.message_handler(commands=['info'])
+# def send_info(message):
+#     bot.reply_to(message, get_info())
 
 @bot.message_handler(commands=['forecast'])
 def send_forecast(message):
