@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup as bs
 latitude = '40.7239'
 longitude = '-73.9899'
 
-def API_okay():
+def API_status():
     url = f"https://api.weather.gov/"
     response = r.get(url).json()
     
@@ -20,7 +20,6 @@ def API_okay():
         return status
 
 def get_alerts():
-    # alerts_endpoint = f"https://api.weather.gov/alerts?point={latitude},{longitude}"
     alerts_endpoint = f"https://api.weather.gov/alerts/active?point={latitude},{longitude}"
     alerts_data = r.get(alerts_endpoint).json()
     
@@ -80,15 +79,9 @@ def get_hourly_forecast():
 
     return hourly_data_list
 
-def get_info():
-    url = f"https://github.com/HudsonOnHere/weather-bot/blob/main/README.md"
+def legal_info():
+    url = f"https://raw.githubusercontent.com/HudsonOnHere/weather-bot/main/LICENSE"
     data = r.get(url)
     soup = bs(data.text, 'html.parser')
-    container = soup.find(class_="readme")
-    tags = container.find_all('p')
 
-    info_list = ""
-
-    info_list += f"""{tags[0].text}\n\n{tags[4].text}\n\n{tags[5].text}"""
-
-    return info_list
+    return soup
