@@ -2,6 +2,9 @@
 
 A telegram bot, written for NYC ESK8, designed to report on the weather conditions in New York City. This bot returns data from the National Weather Service's API. See screenshots for example usage.
 
+![Image](/images/Daily-Forecast.png)
+![Image](/images/Hourly-Forecast.png)
+
 # How to make this your own
 
 First, you will have to obtain your own unique Telegram API key from @BotFather on Telegram. There is good documentation on working with BotFather, but it is a fairly simple proess.
