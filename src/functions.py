@@ -24,19 +24,20 @@ def get_alerts():
     alerts_data = r.get(alerts_endpoint).json()
     
     alerts_data_list = ""
+
     footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
+    no_alerts_msg = f"""Ain't no alerts, check Citizen if you want action.\n\n"""
+
 
     for alert in alerts_data['features']:
 
-        alerts_data_list += f"""{alert['properties']['headline']}:\n{alert['properties']['severity']}\n{alert['properties']['description']}\n\n"""
+        alerts_data_list += f"""{alert['properties']['headline']}:\nSeverity: {alert['properties']['severity']}\n\n{alert['properties']['description']}\n\n"""
 
     if alerts_data_list == "":
-        alerts_data_list += f"""Ain't no alerts, check Citizen if you want action.\n\n"""
+        alerts_data_list += f"""{no_alerts_msg}\n\n{footer}"""
 
     else:
-        alerts_data_list += f"""Idk here's some alerts or w/e:\n\n"""
-    
-    alerts_data_list += f"{footer}"
+        alerts_data_list += f"""{footer}"""
 
     return alerts_data_list
 
