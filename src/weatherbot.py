@@ -1,122 +1,104 @@
 import telebot
-from telebot import types, util
-from dotenv import load_dotenv
-import os
-# from functions import FORECAST_GRID, GRID_X, GRID_Y, get_forecast, get_hourly_forecast, get_alerts, API_status, geocoding, legal_info
-from functions import *
 import logging
+from telebot import util, types
+from telebot import types
+from dotenv import load_dotenv
+from os import getenv
+from time import sleep
+from functions import Coordinates, Misc_Functions
 
-
-
-logger = telebot.logger
-telebot.logger.setLevel(logging.INFO)
+logger = telebot.telebot.logger
+# telebot.logger.setLevel(logging.INFO)
+# telebot.telebot.logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-# BOT_KEY = os.getenv('BOT_KEY')
-BOT_KEY = os.getenv('TEST_BOT')
+id = 4574196084114094455
+
+# BOT_KEY = os.getenv('BOT_KEY') # Prroduction bot key
+BOT_KEY = getenv('TEST_BOT') # Test bot key
 
 bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
-
-# testing global variables
-LATITUDE = 0
-LONGITUDE = 0
+geo_code = Coordinates()
 
 @bot.message_handler(chat_types=['group', 'supergroup', 'channel'], commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "I just sent you a direct message.")
-    bot.send_message(message.from_user.id, "Hi, I'm WeatherBot!\n\nSend me your location to get the weather in your area, or send me /start again for more options.\n\nSend /help for more info on commands.")
-
-# @bot.message_handler(commands=['help'])
-# def send_help(message):
-#     bot.reply_to(message, "I'm WeatherBot, I can tell you the weather.\n\nInteract with me by sending one of these commands:\n\n/alerts - gives you the current alerts.\n\n/forecast - gives you the daily forecast.\n\n/hourly - gives you the hourly forecast.\n\n/help - gives you this message.")
-
-# @bot.message_handler(commands=['legal'])
-# def send_license(message):
-#     bot.reply_to(message, legal_info())
-
-# @bot.message_handler(commands=['forecast'])
-# def send_forecast(message):
-#     bot.reply_to(message, "Best I can do is like 3 days:\n\n" + get_forecast())
-
-# @bot.message_handler(commands=['hourly'])
-# def send_hourly(message):
-#     bot.reply_to(message, "Here's what the next 12 hours looks like:\n\n" + get_hourly_forecast())
-
-# @bot.message_handler(commands=['status'])
-# def send_status(message):
-#     bot.reply_to(message, API_status())
-
-# @bot.message_handler(commands=['alerts'])
-# def send_alerts(message):
-#     bot.reply_to(message, get_alerts())
-
-
+    logger.info(f"""Start command received:\n\n{message.chat.id} - {message.chat.title} - {message.chat.type}\n""")
+    bot.reply_to(message, "Keep an eye out for a direct message from me.")
+    sleep(2)
+    bot.send_message(message.from_user.id, "Hi, I'm WeatherBot!\n\nSend me your location to get the weather in your area.\n\nSend /help for more info on commands.")
 
 @bot.message_handler(chat_types=['private'], content_types=['location'])
 def handle_location(message):
-
-    global LATITUDE
-    global LONGITUDE
-
-    LATITUDE = message.location.latitude
-    LONGITUDE = message.location.longitude
-    geocoding(LATITUDE, LONGITUDE)
-
-    bot.reply_to(message, f"""This you?? {LATITUDE}, {LONGITUDE}""")
-    return LATITUDE, LONGITUDE
+    latitude = message.location.latitude
+    longitude = message.location.longitude
+    user_id = message.from_user.id
+    logger.info(f"""Location received - Private chat\n\n{message.from_user.id} - {message.location.latitude}, {message.location.longitude}\n""")
+    geo_code.update_geocoding(user_id, latitude, longitude)
+    bot.reply_to(message, "Location received, send /start to begin.")
 
 
 @bot.message_handler(chat_types=['private'], commands=['start'])
-def starting_point(message):
-
-    if LATITUDE == 0 or LONGITUDE == 0:
-        bot.reply_to(message, "Please send me your location first.")
-    
-    else:
-        mkup = types.InlineKeyboardMarkup(row_width=2)
-        itembtn1 = types.InlineKeyboardButton("3 Day Forecast", callback_data="3day")
-        itembtn2 = types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly")
-        mkup.add(itembtn1, itembtn2)
-        text = "What would you like to see?"
-        bot.send_message(message.chat.id, text, reply_markup=mkup)
+def start_command(message):
+    logger.info(f"""Start command received:\n\n{message.chat.id} - {message.chat.type}\n""")
+    mkup = types.InlineKeyboardMarkup(row_width=2)
+    itembtn1 = types.InlineKeyboardButton("3 Day Forecast", callback_data="3day")
+    itembtn2 = types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly")
+    mkup.add(itembtn1, itembtn2)
+    text = "What would you like to see?"
+    bot.send_message(message.chat.id, text, reply_markup=mkup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == '3day')
 def a_choosen(call):
+    logger.info(f""""callback_data: 3day, Call ID:{call.id} user ID:{call.from_user.id}\n""")
     mkup = types.InlineKeyboardMarkup(row_width=1)
-    # itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
-    # mkup.add(itembtn1)
-    text = "3 Day Forecast"
+    itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
+    mkup.add(itembtn1)
+    text = "Updating..."
     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
-    bot.send_message(call.message.chat.id, get_forecast(FORECAST_GRID, GRID_X, GRID_Y))
+    geo_code.store_call_id(call.from_user.id, call.id)
+    print(geo_code.call_id[call.from_user.id])
+    # global id
+    # id = call.id
+    
+    bot.answer_callback_query(callback_query_id=True, show_alert=False)
+    def callback_answer(call):
+        logger.info(f"callback answer triggered")
+        bot.send_message(call.from_user.id, geo_code.get_forecast(Coordinates.get_forecast(call.from_user.id)))
+
+# @bot.answer_callback_query(callback_query_id=id , show_alert=False, cache_time=100)
+# def a_choosen(call):
+#     # logger.info(f""""callback_data: 3day, Call ID:{call.id}\n""")
+#     logger.info(f"answer_callback_query triggered")
+#     bot.send_message(call.from_user.id, geo_code.get_forecast(Coordinates.get_forecast(call.from_user.id)))
+
+
+
+
+
+
+
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'hourly')
 def b_choosen(call):
     mkup = types.InlineKeyboardMarkup(row_width=1)
-    # itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
-    # mkup.add(itembtn1)
+    itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
+    mkup.add(itembtn1)
     text = "Hourly Forecast"
     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
+    bot.send_message(call.message.chat.id, geo_code.get_hourly_forecast(call.message.from_user.id))
 
-@bot.callback_query_handler(func=lambda call: call.data == 'back')
-def c_choosen(call):
-    mkup = types.InlineKeyboardMarkup(row_width=2)
-    itembtn1 = types.InlineKeyboardButton("3 Day Forecast", callback_data="3day")
-    itembtn2 = types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly")
-    mkup.add(itembtn1, itembtn2)
-    text = "Hello again! Choose one."
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
-
-
-@bot.message_handler(commands=['test'])
-def test_command(message):
-    bot.reply_to(message, "Check the console for output, the default values are 0.")
-    print(f"Sender: {message.from_user.username}")
-    print(f"Latitude: {LATITUDE}")
-    print(f"Longitude: {LONGITUDE}")
-
+# @bot.callback_query_handler(func=lambda call: call.data == 'back')
+# def c_choosen(call):
+#     mkup = types.InlineKeyboardMarkup(row_width=2)
+#     itembtn1 = types.InlineKeyboardButton("3 Day Forecast", callback_data="3day")
+#     itembtn2 = types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly")
+#     mkup.add(itembtn1, itembtn2)
+#     text = "Please choose one."
+#     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
 
 
 bot.infinity_polling(interval=0, timeout=15)

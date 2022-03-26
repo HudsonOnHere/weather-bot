@@ -22,18 +22,60 @@ class Misc_Functions:
         return r.get(url).text
 
 
-class Geo_Functions:
-    def __init__(self, latitude, longitude):
-        self.latitude = latitude
-        self.longitude = longitude
+class Coordinates:
+    def __init__(self):
+        self.grids = {}
+        self.call_id = {}
 
-    def update_geocoding(self):
-        points = f"https://api.weather.gov/points/{self.latitude},{self.longitude}"
+    def update_geocoding(self, user_id, latitude, longitude):
+        points = f"https://api.weather.gov/points/{latitude},{longitude}"
         points_data = r.get(points).json()
-        self.grid_id = points_data['properties']['gridId']
-        self.grid_x = points_data['properties']['gridX']
-        self.grid_y = points_data['properties']['gridY']
 
+        self.grids[user_id] = {
+            'grid_id': points_data['properties']['gridId'],
+            'grid_x': points_data['properties']['gridX'],
+            'grid_y': points_data['properties']['gridY'],
+        }
+
+    def store_call_id(self, user_id, call_id):
+        self.call_id[user_id] = call_id
+
+
+    def get_forecast(self, user_id):
+        user_grid = self.grids[user_id]
+        endpoint = f"""https://api.weather.gov/gridpoints/{user_grid['grid_id']}/{user_grid['grid_x']},{user_grid['grid_y']}/forecast"""
+        forecast_data = r.get(endpoint).json()
+        forecast_data_list = ""
+        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
+
+        for forecast in forecast_data['properties']['periods']:
+
+            if forecast['number'] in range(0,7):
+
+                forecast_data_list += f"""{forecast['name']}: {forecast['temperature']}˚ {forecast['temperatureUnit']}\n{forecast['detailedForecast']}\n\n"""
+
+        forecast_data_list += f"{footer}"
+        
+        return forecast_data_list
+
+    def get_hourly_forecast(self, user_id):
+        user_grid = self.grids[user_id]
+        endpoint = f"""https://api.weather.gov/gridpoints/{user_grid.grid_id}/{user_grid.grid_x},{user_grid.grid_y}/forecast/hourly"""
+        hourly_data = r.get(endpoint).json()
+        hourly_data_list = ""
+        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
+
+        for hourly in hourly_data['properties']['periods']:
+
+            if hourly['number'] in range(0,13):
+
+                hourly_data_list += f"""{hourly['name']}: {hourly['temperature']}˚ {hourly['temperatureUnit']}\n{hourly['detailedForecast']}\n\n"""
+
+        hourly_data_list += f"{footer}"
+        
+        return hourly_data_list
+
+class Functions:
     def get_alerts(self):
         endpoint = f"https://api.weather.gov/alerts/active?point={self.latitude},{self.longitude}"
         alerts_data = r.get(endpoint).json()
@@ -84,3 +126,4 @@ class Geo_Functions:
         hourly_data_list += f"{footer}"
         
         return hourly_data_list
+
