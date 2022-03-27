@@ -25,7 +25,6 @@ class Misc_Functions:
 class Coordinates:
     def __init__(self):
         self.grids = {}
-        self.call_id = {}
 
     def update_geocoding(self, user_id, latitude, longitude):
         points = f"https://api.weather.gov/points/{latitude},{longitude}"
@@ -36,10 +35,6 @@ class Coordinates:
             'grid_x': points_data['properties']['gridX'],
             'grid_y': points_data['properties']['gridY'],
         }
-
-    def store_call_id(self, user_id, call_id):
-        self.call_id[user_id] = call_id
-
 
     def get_forecast(self, user_id):
         user_grid = self.grids[user_id]
@@ -60,7 +55,7 @@ class Coordinates:
 
     def get_hourly_forecast(self, user_id):
         user_grid = self.grids[user_id]
-        endpoint = f"""https://api.weather.gov/gridpoints/{user_grid.grid_id}/{user_grid.grid_x},{user_grid.grid_y}/forecast/hourly"""
+        endpoint = f"""https://api.weather.gov/gridpoints/{user_grid['grid_id']}/{user_grid['grid_x']},{user_grid['grid_y']}/forecast/hourly"""
         hourly_data = r.get(endpoint).json()
         hourly_data_list = ""
         footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""

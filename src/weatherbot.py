@@ -8,19 +8,15 @@ from time import sleep
 from functions import Coordinates, Misc_Functions
 
 logger = telebot.telebot.logger
-# telebot.logger.setLevel(logging.INFO)
-# telebot.telebot.logger.setLevel(logging.INFO)
 logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-id = 4574196084114094455
-
-# BOT_KEY = os.getenv('BOT_KEY') # Prroduction bot key
+# BOT_KEY = getenv('BOT_KEY') # Production bot key
 BOT_KEY = getenv('TEST_BOT') # Test bot key
-
 bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
 geo_code = Coordinates()
+
 
 @bot.message_handler(chat_types=['group', 'supergroup', 'channel'], commands=['start'])
 def send_welcome(message):
@@ -50,23 +46,49 @@ def start_command(message):
     bot.send_message(message.chat.id, text, reply_markup=mkup)
 
 
-@bot.callback_query_handler(func=lambda call: call.data == '3day')
-def a_choosen(call):
-    logger.info(f""""callback_data: 3day, Call ID:{call.id} user ID:{call.from_user.id}\n""")
-    mkup = types.InlineKeyboardMarkup(row_width=1)
-    itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
-    mkup.add(itembtn1)
-    text = "Updating..."
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
-    geo_code.store_call_id(call.from_user.id, call.id)
-    print(geo_code.call_id[call.from_user.id])
-    # global id
-    # id = call.id
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+
+    user_id = call.from_user.id
+
+    if call.data == "3day":
+        logger.info(f"3 Day Forecast button pressed\n")
+        logger.info(f"{call.from_user.id}")
+        bot.answer_callback_query(call.id, text="3 Day Forecast")
+        bot.send_message(user_id, geo_code.get_forecast(user_id))
+
+    elif call.data == "hourly":
+        logger.info(f"Hourly Forecast button pressed\n")
+        bot.answer_callback_query(call.id, text="Hourly Forecast")
+        bot.send_message(user_id, geo_code.get_hourly_forecast(user_id))
+
+    else:
+        logger.info(f"Unknown button pressed\n")
+        bot.answer_callback_query(call.id, text="Error")
+        bot.send_message(call.message.chat.id, "Error")
+
+
+
+
+
+
+# @bot.callback_query_handler(func=lambda call: call.data == '3day')
+# def a_choosen(call):
+#     logger.info(f""""callback_data: 3day, Call ID:{call.id} user ID:{call.from_user.id}\n""")
+#     mkup = types.InlineKeyboardMarkup(row_width=1)
+#     itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
+#     mkup.add(itembtn1)
+#     text = "Updating..."
+#     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
+#     geo_code.store_call_id(call.from_user.id, call.id)
+#     print(geo_code.call_id[call.from_user.id])
+#     # global id
+#     # id = call.id
     
-    bot.answer_callback_query(callback_query_id=True, show_alert=False)
-    def callback_answer(call):
-        logger.info(f"callback answer triggered")
-        bot.send_message(call.from_user.id, geo_code.get_forecast(Coordinates.get_forecast(call.from_user.id)))
+#     bot.answer_callback_query(callback_query_id=True, show_alert=False)
+#     def callback_answer(call):
+#         logger.info(f"callback answer triggered")
+#         bot.send_message(call.from_user.id, geo_code.get_forecast(Coordinates.get_forecast(call.from_user.id)))
 
 # @bot.answer_callback_query(callback_query_id=id , show_alert=False, cache_time=100)
 # def a_choosen(call):
@@ -75,21 +97,14 @@ def a_choosen(call):
 #     bot.send_message(call.from_user.id, geo_code.get_forecast(Coordinates.get_forecast(call.from_user.id)))
 
 
-
-
-
-
-
-
-
-@bot.callback_query_handler(func=lambda call: call.data == 'hourly')
-def b_choosen(call):
-    mkup = types.InlineKeyboardMarkup(row_width=1)
-    itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
-    mkup.add(itembtn1)
-    text = "Hourly Forecast"
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
-    bot.send_message(call.message.chat.id, geo_code.get_hourly_forecast(call.message.from_user.id))
+# @bot.callback_query_handler(func=lambda call: call.data == 'hourly')
+# def b_choosen(call):
+#     mkup = types.InlineKeyboardMarkup(row_width=1)
+#     itembtn1 = types.InlineKeyboardButton("Back", callback_data="back")
+#     mkup.add(itembtn1)
+#     text = "Hourly Forecast"
+#     bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=mkup)
+#     bot.send_message(call.message.chat.id, geo_code.get_hourly_forecast(call.message.from_user.id))
 
 # @bot.callback_query_handler(func=lambda call: call.data == 'back')
 # def c_choosen(call):
