@@ -40,8 +40,8 @@ class Coordinates:
         user_grid = self.grids[user_id]
         endpoint = f"""https://api.weather.gov/gridpoints/{user_grid['grid_id']}/{user_grid['grid_x']},{user_grid['grid_y']}/forecast"""
         forecast_data = r.get(endpoint).json()
-        forecast_data_list = ""
-        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
+        forecast_data_list = f"Here's the next 3 days for your area:\n\n"
+        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M %p")}"""
 
         for forecast in forecast_data['properties']['periods']:
 
@@ -57,20 +57,22 @@ class Coordinates:
         user_grid = self.grids[user_id]
         endpoint = f"""https://api.weather.gov/gridpoints/{user_grid['grid_id']}/{user_grid['grid_x']},{user_grid['grid_y']}/forecast/hourly"""
         hourly_data = r.get(endpoint).json()
-        hourly_data_list = ""
-        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
+        hourly_data_list = f"Here's the next 12 hours for your area:\n\n"
+        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M %p")}"""
 
         for hourly in hourly_data['properties']['periods']:
 
+            start_time = datetime.fromisoformat(hourly['startTime']).strftime("%a %I:%M %p")
+
             if hourly['number'] in range(0,13):
 
-                hourly_data_list += f"""{hourly['name']}: {hourly['temperature']}˚ {hourly['temperatureUnit']}\n{hourly['detailedForecast']}\n\n"""
+                hourly_data_list += f"""{start_time}: {hourly['temperature']}˚ {hourly['temperatureUnit']}\nWind Speed: {hourly['windSpeed']} {hourly['windDirection']}\nConditions: {hourly['shortForecast']}\n\n"""
 
         hourly_data_list += f"{footer}"
         
         return hourly_data_list
 
-class Functions:
+class Unutilized_Class:
     def get_alerts(self):
         endpoint = f"https://api.weather.gov/alerts/active?point={self.latitude},{self.longitude}"
         alerts_data = r.get(endpoint).json()
@@ -89,36 +91,3 @@ class Functions:
             alerts_data_list += f"""{footer}"""
 
         return alerts_data_list
-        
-    def get_forecast(self):
-        endpoint = f"""https://api.weather.gov/gridpoints/{self.grid_id}/{self.grid_x},{self.grid_y}/forecast"""
-        forecast_data = r.get(endpoint).json()
-        forecast_data_list = ""
-        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
-
-        for forecast in forecast_data['properties']['periods']:
-
-            if forecast['number'] in range(0,7):
-
-                forecast_data_list += f"""{forecast['name']}: {forecast['temperature']}˚ {forecast['temperatureUnit']}\n{forecast['detailedForecast']}\n\n"""
-
-        forecast_data_list += f"{footer}"
-        
-        return forecast_data_list
-
-    def get_hourly_forecast(self):
-        endpoint = f"""https://api.weather.gov/gridpoints/{self.grid_id}/{self.grid_x},{self.grid_y}/forecast/hourly"""
-        hourly_data = r.get(endpoint).json()
-        hourly_data_list = ""
-        footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
-
-        for hourly in hourly_data['properties']['periods']:
-
-            if hourly['number'] in range(0,13):
-
-                hourly_data_list += f"""{hourly['name']}: {hourly['temperature']}˚ {hourly['temperatureUnit']}\n{hourly['detailedForecast']}\n\n"""
-
-        hourly_data_list += f"{footer}"
-        
-        return hourly_data_list
-
