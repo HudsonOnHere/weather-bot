@@ -2,8 +2,8 @@
 
 A telegram bot, written for NYC ESK8, designed to report on the weather conditions in New York City. This bot returns data from the National Weather Service's API. See screenshots for example usage.
 
-![Image](/images/Daily-Forecast.png)
-![Image](/images/Hourly-Forecast.png)
+![Image](/images/help.jpeg)
+![Image](/images/start.jpeg)
 
 # How to make this your own
 
