@@ -1,34 +1,37 @@
 import requests as r
 from datetime import datetime
 
-class Misc_Functions:
+class Static_Functions:
     def __init__(self):
         pass
 
     def API_status(self):
         url = f"https://api.weather.gov/"
         response = r.get(url).json()
-        
-        if response['status'] == "OK":
-            status = f"""api.weather.gov/ is available, and returning status code: {response['status']}\n\nLast checked: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
-            return status
-        
-        elif response['status'] != "OK":
-            status = f"""api.weather.gov/ is unavailable, and returning status code: {response['status']}\n\nLast checked: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
-            return status
+
+        if response['status'] == 'OK':
+            return True
+        else:
+            return response['status']
 
     def legal_info(self):
         url = f"https://raw.githubusercontent.com/HudsonOnHere/weather-bot/main/LICENSE"
         return r.get(url).text
 
 
-class Coordinates:
+class Location_Functions:
     def __init__(self):
         self.grids = {}
+        self.coordinates = {}
 
     def update_geocoding(self, user_id, latitude, longitude):
         points = f"https://api.weather.gov/points/{latitude},{longitude}"
         points_data = r.get(points).json()
+
+        self.coordinates[user_id] = {
+            'latitude': latitude,
+            'longitude': longitude,
+        }
 
         self.grids[user_id] = {
             'grid_id': points_data['properties']['gridId'],
@@ -72,13 +75,13 @@ class Coordinates:
         
         return hourly_data_list
 
-class Unutilized_Class:
-    def get_alerts(self):
-        endpoint = f"https://api.weather.gov/alerts/active?point={self.latitude},{self.longitude}"
+    def get_alerts(self, user_id):
+        user_coords = self.coordinates[user_id]
+        endpoint = f"https://api.weather.gov/alerts/active?point={user_coords['latitude']},{user_coords['longitude']}"
         alerts_data = r.get(endpoint).json()
         alerts_data_list = ""
         footer = f"""Last updated: {datetime.now().strftime("%b %d, %Y %I:%M:%S %p")}"""
-        no_alerts_msg = f"""There are currently no alerts in your area, that's probably a good thing.\n\n"""
+        no_alerts_msg = f"""There are currently no active alerts in your area, that's probably a good thing.\n\n"""
 
         for alert in alerts_data['features']:
 
