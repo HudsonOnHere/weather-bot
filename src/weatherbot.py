@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-BOT_KEY = getenv('TEST_BOT')
+BOT_KEY = getenv('BOT_KEY')
 MY_ID = getenv('MY_ID') # useful for functions to be utilized by admin only
 bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
 geo_func = Location_Functions() 
