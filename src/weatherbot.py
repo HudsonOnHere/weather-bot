@@ -1,6 +1,6 @@
 import logging
 import telebot
-from telebot import util, types
+from telebot import types
 from telebot import types
 from dotenv import load_dotenv
 from os import getenv
@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-BOT_KEY = getenv('BOT_KEY')
+BOT_KEY = getenv('TEST_BOT')
 MY_ID = getenv('MY_ID') # useful for functions to be utilized by admin only
 bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
 geo_func = Location_Functions() 
@@ -44,6 +44,8 @@ def send_help(message):
 🔴 /legal - <code>It's 2022, everything needs a disclaimer nowadays</code>"""
 
     bot.reply_to(message, text, parse_mode='HTML')
+
+
 
 """
 Private Chat Functions:
@@ -81,11 +83,10 @@ def start_command(message):
 
     try:
         if geo_func.grids[user_id] != None:
-            mkup = types.InlineKeyboardMarkup(row_width=2)
-            itembtn1 = types.InlineKeyboardButton("3 Day Forecast", callback_data="3day")
-            itembtn2 = types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly")
-            itembtn3 = types.InlineKeyboardButton("Alerts", callback_data="alerts")
-            mkup.add(itembtn1, itembtn2, itembtn3)
+            mkup = types.InlineKeyboardMarkup(row_width=1)
+            mkup.add(types.InlineKeyboardButton("3 Day Forecast", callback_data="3day"),
+                                            types.InlineKeyboardButton("Hourly Forecast", callback_data="hourly"),
+                                            types.InlineKeyboardButton("Alerts", callback_data="alerts"))
             text = "What would you like to see?"
             bot.send_message(message.chat.id, text, reply_markup=mkup)
 
@@ -102,17 +103,17 @@ def callback_inline(call):
     if call.data == "3day":
         logger.info(f"3 Day Forecast button pressed")
         bot.answer_callback_query(call.id, text="3 Day Forecast")
-        bot.send_message(user_id, geo_func.get_forecast(user_id))
+        bot.edit_message_text(chat_id=user_id, message_id=call.message.message_id, text=geo_func.get_forecast(user_id))
 
     elif call.data == "hourly":
         logger.info(f"Hourly Forecast button pressed")
         bot.answer_callback_query(call.id, text="Hourly Forecast")
-        bot.send_message(user_id, geo_func.get_hourly_forecast(user_id))
+        bot.edit_message_text(chat_id=user_id, message_id=call.message.message_id, text=geo_func.get_hourly_forecast(user_id))
 
     elif call.data == "alerts":
         logger.info(f"Alerts button pressed")
         bot.answer_callback_query(call.id, text="Alerts")
-        bot.send_message(user_id, geo_func.get_alerts(user_id))
+        bot.edit_message_text(chat_id=user_id, message_id=call.message.message_id, text=geo_func.get_alerts(user_id))
 
     else:
         logger.info(f"Unknown button pressed")
