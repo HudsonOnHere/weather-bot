@@ -44,7 +44,10 @@ def send_help(message):
 <u>Send a command to interact with me:</u>\n
 🟢 /start - <code>Direct message; location-based weather & alerts</code>\n\n
 🟡 /help - <code>I'll display this message</code>\n\n
-🔴 /legal - <code>It's 2022, everything needs a disclaimer nowadays</code>"""
+🔴 /legal - <code>It's 2022, everything needs a disclaimer nowadays</code>\n\n
+🌦 /forecast - <code>Get the forecast for the next 3 days</code>\n\n
+🌤 /hourly - <code>Get the hourly forecast for the next 12 hours</code>\n\n
+⚠️ /alerts - <code>Get the latest weather alerts</code>\n\n"""
 
     bot.reply_to(message, text, parse_mode='HTML')
 
