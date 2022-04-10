@@ -1,3 +1,4 @@
+from email.policy import default
 import logging
 import telebot
 from telebot import types
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 from os import getenv
 from time import sleep
 from functions import Location_Functions, Static_Functions
+
 
 logger = telebot.telebot.logger
 logger.setLevel(logging.INFO)
@@ -17,6 +19,7 @@ MY_ID = getenv('MY_ID') # useful for functions to be utilized by admin only
 bot = telebot.TeleBot(BOT_KEY, parse_mode=None)
 geo_func = Location_Functions() 
 static_func = Static_Functions()
+
 
 
 """
@@ -44,6 +47,22 @@ def send_help(message):
 🔴 /legal - <code>It's 2022, everything needs a disclaimer nowadays</code>"""
 
     bot.reply_to(message, text, parse_mode='HTML')
+
+
+@bot.message_handler(chat_types=['group', 'supergroup', 'channel'], commands=['forecast'])
+def send_forecast(message):
+    logger.info(f"Forecast command received from: {message.from_user.id} - {message.chat.title} - {message.chat.type}")
+    bot.reply_to(message, geo_func.get_forecast('default'))
+
+@bot.message_handler(chat_types=['group', 'supergroup', 'channel'], commands=['hourly'])
+def send_hourly(message):
+    logger.info(f"Hourly command received from: {message.from_user.id} - {message.chat.title} - {message.chat.type}")
+    bot.reply_to(message, geo_func.get_hourly_forecast('default'))
+
+@bot.message_handler(chat_types=['group', 'supergroup', 'channel'], commands=['alerts'])
+def send_alerts(message):
+    logger.info(f"Alerts command received from: {message.from_user.id} - {message.chat.title} - {message.chat.type}")
+    bot.reply_to(message, geo_func.get_alerts('default'))
 
 
 

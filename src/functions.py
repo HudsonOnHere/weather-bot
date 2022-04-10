@@ -24,6 +24,18 @@ class Location_Functions:
         self.grids = {}
         self.coordinates = {}
 
+        self.grids['default'] = {
+            'grid_id': 'OKX',
+            'grid_x': '33',
+            'grid_y': '36',
+        }
+
+        self.coordinates['default'] = {
+            'latitude': '40.7560',
+            'longitude': '-73.9867',
+        }
+
+
     def update_geocoding(self, user_id, latitude, longitude):
         points = f"https://api.weather.gov/points/{latitude},{longitude}"
         points_data = r.get(points).json()
